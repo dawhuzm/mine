@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GitHub Miner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+        .header {
+            padding: 16px;
+            background: #161b22;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #30363d;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .balance {
+            font-size: 22px;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+
+        .miner-section {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+        .mine-button {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 20px;
+            background: #21262d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            box-shadow: 0 0 40px rgba(88, 166, 255, 0.5);
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+        .mine-button:active {
+            transform: scale(0.85) rotate(20deg);
+        }
+        .status {
+            font-size: 18px;
+            color: #8b949e;
+            margin: 15px 0;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #161b22;
+            display: flex;
+            border-top: 1px solid #30363d;
+            padding: 8px 0 4px;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #8b949e;
+            font-size: 12px;
+            padding: 6px 0;
+        }
+        .nav-item.active {
+            color: #58a6ff;
+        }
+        .nav-item .icon {
+            font-size: 26px;
+            display: block;
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Balance at the top of the miner -->
+    <div class="header">
+        <h1>🪙 GitHub Miner</h1>
+        <div id="balance" class="balance">0 GH Coins</div>
+    </div>
+
+    <div class="miner-section">
+        <div id="mine-button" class="mine-button">⛏️</div>
+        <div class="status">Tap the pickaxe to mine!</div>
+        <div id="rate" style="color:#58a6ff; font-size:16px;">Auto: 0 / sec</div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <span class="icon">🏠</span>
+            Home
+        </div>
+        <div class="nav-item">
+            <span class="icon">🎯</span>
+            Tasks
+        </div>
+        <div class="nav-item">
+            <span class="icon">🏆</span>
+            Rank
+        </div>
+        <div class="nav-item">
+            <span class="icon">👤</span>
+            Profile
+        </div>
+    </nav>
+
+    <script>
+        // Telegram Mini App setup
+        const tg = window.Telegram.WebApp || {};
+        if (tg.expand) tg.expand();
+        if (tg.ready) tg.ready();
+
+        let balance = 12480;
+        let miningRate = 8.5;
+        let lastTime = Date.now();
+
+        function updateUI() {
+            document.getElementById('balance').textContent = Math.floor(balance).toLocaleString() + ' GH Coins';
+            document.getElementById('rate').textContent = `Auto: ${miningRate.toFixed(1)} / sec`;
+        }
+
+        function mine() {
+            balance += 12 + Math.floor(Math.random() * 8);
+            
+            // Visual feedback
+            const btn = document.getElementById('mine-button');
+            btn.style.transform = 'scale(0.8) rotate(25deg)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 120);
+
+            // Haptic feedback if available
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            
+            updateUI();
+        }
+
+        // Click and touch support
+        const mineBtn = document.getElementById('mine-button');
+        mineBtn.addEventListener('click', mine);
+        mineBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            mine();
+        });
+
+        // Passive auto-mining
+        setInterval(() => {
+            const now = Date.now();
+            const delta = (now - lastTime) / 1000;
+            balance += miningRate * delta;
+            lastTime = now;
+            updateUI();
+        }, 800);
+
+        // Initial load
+        updateUI();
+    </script>
+</body>
+  </html>
